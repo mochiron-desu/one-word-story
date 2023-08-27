@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>One Word Story</title>
+</head>
+<body>
+    <h1>One Word Story</h1>
+    <form action="/add_word" method="POST">
+        <input type="text" name="word" placeholder="Enter a word" required>
+        <button type="submit">Add Word</button>
+    </form>
+    <h2>Story So Far:</h2>
+    <ul>
+        {% for word in words %}
+        <li>{{ word[0] }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
