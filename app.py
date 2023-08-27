@@ -13,7 +13,12 @@ def index():
 
 @app.route('/add_word', methods=['POST'])
 def add_word():
-    new_word = request.form['word']
+    new_word = request.form['word'].strip()  # Remove leading/trailing whitespace
+    words = new_word.split()  # Split input into words
+    
+    if len(words) != 1:
+        error_message = "Please enter only one word."
+        return render_template('index.html', error_message=error_message)
     
     with open('words.csv', 'a', newline='') as csvfile:
         csv_writer = csv.writer(csvfile)

@@ -6,14 +6,23 @@
 <body>
     <h1>One Word Story</h1>
     <form action="/add_word" method="POST">
-        <input type="text" name="word" placeholder="Enter a word" required>
+        <input type="text" name="word" id="wordInput" placeholder="Enter a word" required>
         <button type="submit">Add Word</button>
     </form>
+    {% if error_message %}
+    <p style="color: red;">{{ error_message }}</p>
+    <script>
+        document.getElementsByName('word')[0].value = '';
+    </script>
+    {% endif %}
     <h2>Story So Far:</h2>
     <ul>
         {% for word in words %}
         <li>{{ word[0] }}</li>
         {% endfor %}
     </ul>
+    <script>
+        document.getElementById('wordInput').focus();
+    </script>
 </body>
 </html>
