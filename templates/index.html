@@ -16,11 +16,11 @@
     </script>
     {% endif %}
     <h2>Story So Far:</h2>
-    <ul>
+    <p>
         {% for word in words %}
-        <li>{{ word[0] }}</li>
+        {{ word[0] }}{% if not loop.last %} {% endif %}
         {% endfor %}
-    </ul>
+    </p>
     <script>
         document.getElementById('wordInput').focus();
     </script>
