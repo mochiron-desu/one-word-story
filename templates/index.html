@@ -8,9 +8,9 @@
 <body>
     <div id="welcome" style="display: {% if nickname %}none{% else %}block{% endif %}">
         <h1>Welcome to One Word Story!</h1>
-        <form id="nicknameForm">
-            <input type="text" id="nicknameInput" placeholder="Choose a nickname" required>
-            <button type="button" onclick="setNickname()">Start</button>
+        <form id="nicknameForm" method="POST" action="/set_nickname">
+            <input type="text" name="nickname" id="nicknameInput" placeholder="Choose a nickname" required>
+            <button type="submit">Start</button>
         </form>
     </div>
     <div id="main" style="display: {% if nickname %}block{% else %}none{% endif %}">
@@ -19,7 +19,7 @@
             <input type="text" name="word" id="wordInput" placeholder="Enter a word" required>
             <button type="submit">Add Word</button>
         </form>
-        <p id="lastWordMessage">{{ last_word_message }}</p> <!-- Display the last word message here -->
+        <p id="lastWordMessage">{{ last_word_message }}</p>
         {% if error_message %}
         <p style="color: red;">{{ error_message }}</p>
         <script>
@@ -34,33 +34,15 @@
         </p>
         <script>
             document.getElementById('wordInput').focus();
+
+            var nickname = "{{ nickname }}"; // Retrieve the nickname from Flask
+
+            if (nickname !== 'Anonymous') {
+                var lastWordMessage = nickname + " added the last word.";
+                document.getElementById('lastWordMessage').textContent = lastWordMessage;
+            }
         </script>
     </div>
-    <script>
-        function setNickname() {
-            var nicknameInput = document.getElementById('nicknameInput');
-            var nickname = nicknameInput.value.trim();
-            if (nickname !== '') {
-                document.cookie = "nickname=" + encodeURIComponent(nickname) + ";path=/"; // Set the nickname as a cookie
-                document.getElementById('welcome').style.display = 'none';
-                document.getElementById('main').style.display = 'block';
-                document.getElementById('wordInput').focus();
-            }
-        }
-    
-        var nickname = decodeURIComponent(getCookie('nickname'));
-        if (nickname) {
-            document.getElementById('welcome').style.display = 'none';
-            document.getElementById('main').style.display = 'block';
-            document.getElementById('wordInput').focus();
-        }
-    
-        function getCookie(name) {
-            var value = "; " + document.cookie;
-            var parts = value.split("; " + name + "=");
-            if (parts.length === 2) return parts.pop().split(";").shift();
-        }
-    </script>
 </body>
 
 </html>
