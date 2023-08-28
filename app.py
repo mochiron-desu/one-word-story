@@ -84,10 +84,11 @@ def add_word():
     last_action_time = session.get('last_action_time', 0)
     current_time = time.time()
     time_elapsed = current_time - last_action_time
+    forwarded_ip = request.headers.get('X-Forwarded-For')
 
     if time_elapsed < MIN_TIME_BETWEEN_ACTIONS:
         error_message = "Please wait before adding another word."
-        send_log_to_webhook(f"`{get_last_sender_ip()}` Tried to send consecutive words.")
+        send_log_to_webhook(f"`{forwarded_ip}` Tried to send consecutive words.")
         return redirect_with_error('index', error_message)
 
     session['last_action_time'] = current_time
@@ -97,21 +98,20 @@ def add_word():
 
     if len(words) != 1:
         error_message = "Please enter only one word."
-        send_log_to_webhook(f"`{get_last_sender_ip()}` Tried to send mutiple words.")
+        send_log_to_webhook(f"`{forwarded_ip}` Tried to send mutiple words.")
         return redirect_with_error('index', error_message)
 
     last_sender_ip = get_last_sender_ip()
-    forwarded_ip = request.headers.get('X-Forwarded-For')
 
     if last_sender_ip == forwarded_ip:
         error_message = "You cannot send consecutive words."
-        send_log_to_webhook(f"`{last_sender_ip}` tried to send consecutive words.")
+        send_log_to_webhook(f"`{forwarded_ip}` tried to send consecutive words.")
         return redirect_with_error('index', error_message)
 
     with open('words.csv', 'a', newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow([new_word])
-        send_log_to_webhook(f"`{last_sender_ip}` addded the word {new_word}")
+        send_log_to_webhook(f"`{forwarded_ip}` addded the word {new_word}")
 
     set_last_sender_ip(forwarded_ip)
 
