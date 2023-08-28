@@ -5,6 +5,7 @@ import csv
 
 app = Flask(__name__)
 app.config['SESSION_TYPE'] = 'filesystem'
+app.static_folder = 'static'
 Session(app)
 
 def get_last_sender_ip():
@@ -15,19 +16,11 @@ def get_last_sender_ip():
         return None
 
 def set_last_sender_ip(ip):
-    with open('data/last_sender_ip.txt', 'w') as ip_file:
-        ip_file.write(ip)
-
-def get_nickname():
     try:
-        with open('data/nickname.txt', 'r') as nickname_file:
-            return nickname_file.read().strip()
-    except FileNotFoundError:
-        return None
-
-def set_nickname(nickname):
-    with open('data/nickname.txt', 'w') as nickname_file:
-        nickname_file.write(nickname)
+        with open('data/last_sender_ip.txt', 'w') as ip_file:
+            ip_file.write(ip)
+    except Exception as e:
+        print(f"Error writing last sender IP: {e}")
 
 def get_words():
     with open('words.csv', 'r') as csvfile:
@@ -39,19 +32,12 @@ def get_words():
 def index():
     last_sender_ip = get_last_sender_ip()
     words = get_words()
-    nickname = get_nickname() or 'Anonymous'
+    error_message = session.pop('error_message', None)  # Retrieve and clear error message from session
 
     return render_template('index.html',
                            words=words,
                            last_sender_ip=last_sender_ip,
-                           nickname=nickname)
-
-@app.route('/set_nickname', methods=['POST'])
-def set_nickname_route():
-    new_nickname = request.form['nickname'].strip()
-    if new_nickname:
-        set_nickname(new_nickname)
-    return redirect(url_for('index'))
+                           error_message=error_message)
 
 @app.route('/add_word', methods=['POST'])
 def add_word():
@@ -63,11 +49,7 @@ def add_word():
 
     if time_elapsed < MIN_TIME_BETWEEN_ACTIONS:
         error_message = "Please wait before adding another word."
-        return render_template('index.html',
-                               error_message=error_message,
-                               words=get_words(),
-                               last_sender_ip=get_last_sender_ip(),
-                               nickname=get_nickname())
+        return redirect_with_error('index', error_message)
 
     session['last_action_time'] = current_time
 
@@ -76,22 +58,14 @@ def add_word():
 
     if len(words) != 1:
         error_message = "Please enter only one word."
-        return render_template('index.html',
-                               error_message=error_message,
-                               words=get_words(),
-                               last_sender_ip=get_last_sender_ip(),
-                               nickname=get_nickname())
+        return redirect_with_error('index', error_message)
 
     last_sender_ip = get_last_sender_ip()
     forwarded_ip = request.headers.get('X-Forwarded-For')
 
     if last_sender_ip == forwarded_ip:
         error_message = "You cannot send consecutive words."
-        return render_template('index.html',
-                               error_message=error_message,
-                               words=get_words(),
-                               last_sender_ip=last_sender_ip,
-                               nickname=get_nickname())
+        return redirect_with_error('index', error_message)
 
     with open('words.csv', 'a', newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
@@ -99,14 +73,11 @@ def add_word():
 
     set_last_sender_ip(forwarded_ip)
 
-    nickname = get_nickname() or 'Anonymous'
-    last_word_message = f"{nickname} added the last word."
+    return redirect_with_error('index', "")  # Redirect back to the main page
 
-    return render_template('index.html',
-                           last_word_message=last_word_message,
-                           words=get_words(),
-                           last_sender_ip=last_sender_ip,
-                           nickname=nickname)
+def redirect_with_error(route, error_message):
+    session['error_message'] = error_message
+    return redirect(url_for(route))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)
