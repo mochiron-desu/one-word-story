@@ -1,12 +1,25 @@
+import os
 import time
 from flask import Flask, request, render_template, redirect, url_for, session
 from flask_session import Session
 import csv
+import requests
 
 app = Flask(__name__)
 app.config['SESSION_TYPE'] = 'filesystem'
 app.static_folder = 'static'
 Session(app)
+
+WEBHOOK_URL = os.environ['WEBHOOK_URL']
+
+# Function to send log messages to the Discord webhook
+def send_log_to_webhook(message):
+    payload = {
+        "content": message
+    }
+    response = requests.post(WEBHOOK_URL, json=payload)
+    if response.status_code != 204:
+        print("Failed to send log to webhook")
 
 def get_last_sender_ip():
     try:
@@ -20,7 +33,7 @@ def set_last_sender_ip(ip):
         with open('data/last_sender_ip.txt', 'w') as ip_file:
             ip_file.write(ip)
     except Exception as e:
-        print(f"Error writing last sender IP: {e}")
+        send_log_to_webhook(f"Error writing last sender IP: {e}")
 
 def get_words():
     with open('words.csv', 'r') as csvfile:
@@ -49,6 +62,7 @@ def add_word():
 
     if time_elapsed < MIN_TIME_BETWEEN_ACTIONS:
         error_message = "Please wait before adding another word."
+        send_log_to_webhook(f"`{get_last_sender_ip()}` Tried to send consecutive words.")
         return redirect_with_error('index', error_message)
 
     session['last_action_time'] = current_time
@@ -58,6 +72,7 @@ def add_word():
 
     if len(words) != 1:
         error_message = "Please enter only one word."
+        send_log_to_webhook(f"`{get_last_sender_ip()}` Tried to send mutiple words.")
         return redirect_with_error('index', error_message)
 
     last_sender_ip = get_last_sender_ip()
@@ -65,11 +80,13 @@ def add_word():
 
     if last_sender_ip == forwarded_ip:
         error_message = "You cannot send consecutive words."
+        send_log_to_webhook(f"`{last_sender_ip}` tried to send consecutive words.")
         return redirect_with_error('index', error_message)
 
     with open('words.csv', 'a', newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow([new_word])
+        send_log_to_webhook(f"`{last_sender_ip}` addded the word {new_word}")
 
     set_last_sender_ip(forwarded_ip)
 

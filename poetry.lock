@@ -15,6 +15,22 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
+name = "certifi"
+version = "2023.7.22"
+description = "Python package for providing Mozilla's CA Bundle."
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[[package]]
+name = "charset-normalizer"
+version = "3.2.0"
+description = "The Real First Universal Charset Detector. Open, modern and actively maintained alternative to Chardet."
+category = "main"
+optional = false
+python-versions = ">=3.7.0"
+
+[[package]]
 name = "click"
 version = "8.1.7"
 description = "Composable command line interface toolkit"
@@ -65,6 +81,14 @@ cachelib = "*"
 flask = ">=2.2"
 
 [[package]]
+name = "idna"
+version = "3.4"
+description = "Internationalized Domain Names in Applications (IDNA)"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[[package]]
 name = "itsdangerous"
 version = "2.1.2"
 description = "Safely pass data to untrusted environments and back."
@@ -95,6 +119,38 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
+name = "requests"
+version = "2.31.0"
+description = "Python HTTP for Humans."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+certifi = ">=2017.4.17"
+charset-normalizer = ">=2,<4"
+idna = ">=2.5,<4"
+urllib3 = ">=1.21.1,<3"
+
+[package.extras]
+socks = ["PySocks (>=1.5.6,!=1.5.7)"]
+use_chardet_on_py3 = ["chardet (>=3.0.2,<6)"]
+
+[[package]]
+name = "urllib3"
+version = "2.0.4"
+description = "HTTP library with thread-safe connection pooling, file post, and more."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.extras]
+brotli = ["brotli (>=1.0.9)", "brotlicffi (>=0.8.0)"]
+secure = ["certifi", "cryptography (>=1.9)", "idna (>=2.0.0)", "pyopenssl (>=17.1.0)", "urllib3-secure-extra"]
+socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
+zstd = ["zstandard (>=0.18.0)"]
+
+[[package]]
 name = "werkzeug"
 version = "2.3.7"
 description = "The comprehensive WSGI web application library."
@@ -111,16 +167,21 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "2ff90d4791a02a60f23d2d90b2d8ffd32ca3f646fa0e3bb894d34130dbf0a427"
+content-hash = "6a8e8c26ebae821a107fff9217a47eb177f75f529f8632c8d021bf43eb9f58a4"
 
 [metadata.files]
 blinker = []
 cachelib = []
+certifi = []
+charset-normalizer = []
 click = []
 colorama = []
 flask = []
 flask-session = []
+idna = []
 itsdangerous = []
 jinja2 = []
 markupsafe = []
+requests = []
+urllib3 = []
 werkzeug = []
