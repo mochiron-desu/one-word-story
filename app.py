@@ -3,7 +3,9 @@ import time
 from flask import Flask, request, render_template, redirect, url_for, session
 from flask_session import Session
 import csv
+import threading
 import requests
+import time
 
 app = Flask(__name__)
 app.config['SESSION_TYPE'] = 'filesystem'
@@ -11,6 +13,29 @@ app.static_folder = 'static'
 Session(app)
 
 WEBHOOK_URL = os.environ['WEBHOOK_URL']
+
+def health_check_and_log():
+    while True:
+        # Perform a health check request to your server
+        try:
+            response = requests.get("https://one-word-story.mochirondesu.repl.co/")  # Adjust the URL as needed
+            if response.status_code == 200:
+                message = "Server is healthy."
+            else:
+                message = f"Health check failed. Status code: {response.status_code}"
+        except requests.RequestException as e:
+            message = f"Health check failed. Error: {e}"
+
+        # Send log message to the Discord webhook
+        payload = {
+            "content": f"[Health Check] {message}"
+        }
+        webhook_response = requests.post(WEBHOOK_URL, json=payload)
+        if webhook_response.status_code != 204:
+            print("Failed to send health check log to webhook")
+
+        # Wait for the specified interval before performing the next health check
+        time.sleep(60 * 10)  # Adjust the interval (in seconds) as needed
 
 # Function to send log messages to the Discord webhook
 def send_log_to_webhook(message):
@@ -97,4 +122,10 @@ def redirect_with_error(route, error_message):
     return redirect(url_for(route))
 
 if __name__ == '__main__':
+    # Start the health checker thread
+    health_checker_thread = threading.Thread(target=health_check_and_log)
+    health_checker_thread.daemon = True  # Allow the thread to exit when the main program exits
+    health_checker_thread.start()
+
+    # Start the Flask application
     app.run(host='0.0.0.0', port=8080, debug=True)
