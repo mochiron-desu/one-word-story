@@ -1,0 +1,53 @@
+/* styles.css */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f0e4; /* Light cream color */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    min-height: 100vh; /* Set minimum viewport height */
+    flex-direction: column; /* Stack items vertically */
+}
+
+#main {
+    width: 90%; /* Adjust width for smaller screens */
+    max-width: 600px;
+    padding: 20px;
+    background-color: #fff; /* White background */
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 20px; /* Add margin around the main content */
+}
+
+h1 {
+    color: #e38256; /* Warm orange color */
+    margin-bottom: 10px; /* Add space below the title */
+}
+
+form {
+    display: flex;
+    flex-direction: column; /* Stack form items vertically */
+    align-items: center;
+    margin-top: 20px;
+}
+
+input[type="text"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%; /* Full width on small screens */
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #e38256; /* Warm orange color */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}

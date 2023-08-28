@@ -5,6 +5,7 @@ import csv
 
 app = Flask(__name__)
 app.config['SESSION_TYPE'] = 'filesystem'
+app.static_folder = 'static'  # Specify the directory for static files
 Session(app)
 
 def get_last_sender_ip():
@@ -17,6 +18,7 @@ def get_last_sender_ip():
 def set_last_sender_ip(ip):
     with open('data/last_sender_ip.txt', 'w') as ip_file:
         ip_file.write(ip)
+
 
 def get_words():
     with open('words.csv', 'r') as csvfile:
