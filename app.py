@@ -18,17 +18,6 @@ def set_last_sender_ip(ip):
     with open('data/last_sender_ip.txt', 'w') as ip_file:
         ip_file.write(ip)
 
-def get_nickname():
-    try:
-        with open('data/nickname.txt', 'r') as nickname_file:
-            return nickname_file.read().strip()
-    except FileNotFoundError:
-        return None
-
-def set_nickname(nickname):
-    with open('data/nickname.txt', 'w') as nickname_file:
-        nickname_file.write(nickname)
-
 def get_words():
     with open('words.csv', 'r') as csvfile:
         csv_reader = csv.reader(csvfile)
@@ -39,19 +28,10 @@ def get_words():
 def index():
     last_sender_ip = get_last_sender_ip()
     words = get_words()
-    nickname = get_nickname() or 'Anonymous'
 
     return render_template('index.html',
                            words=words,
-                           last_sender_ip=last_sender_ip,
-                           nickname=nickname)
-
-@app.route('/set_nickname', methods=['POST'])
-def set_nickname_route():
-    new_nickname = request.form['nickname'].strip()
-    if new_nickname:
-        set_nickname(new_nickname)
-    return redirect(url_for('index'))
+                           last_sender_ip=last_sender_ip)
 
 @app.route('/add_word', methods=['POST'])
 def add_word():
@@ -66,8 +46,7 @@ def add_word():
         return render_template('index.html',
                                error_message=error_message,
                                words=get_words(),
-                               last_sender_ip=get_last_sender_ip(),
-                               nickname=get_nickname())
+                               last_sender_ip=get_last_sender_ip())
 
     session['last_action_time'] = current_time
 
@@ -79,8 +58,7 @@ def add_word():
         return render_template('index.html',
                                error_message=error_message,
                                words=get_words(),
-                               last_sender_ip=get_last_sender_ip(),
-                               nickname=get_nickname())
+                               last_sender_ip=get_last_sender_ip())
 
     last_sender_ip = get_last_sender_ip()
     forwarded_ip = request.headers.get('X-Forwarded-For')
@@ -90,8 +68,7 @@ def add_word():
         return render_template('index.html',
                                error_message=error_message,
                                words=get_words(),
-                               last_sender_ip=last_sender_ip,
-                               nickname=get_nickname())
+                               last_sender_ip=last_sender_ip)
 
     with open('words.csv', 'a', newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
@@ -99,14 +76,12 @@ def add_word():
 
     set_last_sender_ip(forwarded_ip)
 
-    nickname = get_nickname() or 'Anonymous'
-    last_word_message = f"{nickname} added the last word."
+    last_word_message = "The last word was added."
 
     return render_template('index.html',
                            last_word_message=last_word_message,
                            words=get_words(),
-                           last_sender_ip=last_sender_ip,
-                           nickname=nickname)
+                           last_sender_ip=last_sender_ip)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)

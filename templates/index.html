@@ -6,14 +6,7 @@
 </head>
 
 <body>
-    <div id="welcome" style="display: {% if nickname %}none{% else %}block{% endif %}">
-        <h1>Welcome to One Word Story!</h1>
-        <form id="nicknameForm" method="POST" action="/set_nickname">
-            <input type="text" name="nickname" id="nicknameInput" placeholder="Choose a nickname" required>
-            <button type="submit">Start</button>
-        </form>
-    </div>
-    <div id="main" style="display: {% if nickname %}block{% else %}none{% endif %}">
+    <div id="main">
         <h1>One Word Story</h1>
         <form action="/add_word" method="POST">
             <input type="text" name="word" id="wordInput" placeholder="Enter a word" required>
@@ -34,13 +27,6 @@
         </p>
         <script>
             document.getElementById('wordInput').focus();
-
-            var nickname = "{{ nickname }}"; // Retrieve the nickname from Flask
-
-            if (nickname !== 'Anonymous') {
-                var lastWordMessage = nickname + " added the last word.";
-                document.getElementById('lastWordMessage').textContent = lastWordMessage;
-            }
         </script>
     </div>
 </body>
