@@ -7,6 +7,7 @@ Welcome to the One-Word Story Game project! This is a simple web application wri
 - Players can add one word to the story in turns.
 - Health checker periodically monitors server health and sends logs to a Discord webhook.
 - Basic session management to prevent abuse and spam.
+- Automatic saving of monthly story archives.
 - Minimalistic front-end using Flask templates.
 
 ## Getting Started
@@ -16,6 +17,13 @@ Welcome to the One-Word Story Game project! This is a simple web application wri
 - Python 3.x
 - Flask
 - Flask-Session
+- schedule
+- datetime
+- os
+- time
+- csv
+- threading
+- requests
 
 ### Installation
 
@@ -45,11 +53,12 @@ Welcome to the One-Word Story Game project! This is a simple web application wri
 - Players can visit the homepage and add one word to the ongoing story.
 - The application enforces a time interval between word additions to prevent spam.
 - The health checker monitors the server's health and logs results to a Discord webhook.
+- The `save_words_for_previous_month()` function automatically saves the story for the previous month.
+- The `schedule_daily_task()` function schedules the automatic saving task to run daily.
 
 ## Contributing
 
 Contributions are welcome! If you find a bug or want to improve the project, feel free to open an issue or submit a pull request.
-
 
 ## Acknowledgements
 
