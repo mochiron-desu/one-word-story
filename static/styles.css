@@ -51,3 +51,30 @@ button {
     border-radius: 4px;
     cursor: pointer;
 }
+
+@media screen and (max-width: 768px) {
+    #main {
+        width: 80%; /* Adjust width for smaller screens */
+        margin: 10px; /* Reduce margin on small screens */
+    }
+
+    h1 {
+        font-size: 1.5em; /* Decrease font size on small screens */
+    }
+
+    input[type="text"] {
+        font-size: 12px; /* Reduce font size on small screens */
+    }
+
+    button {
+        font-size: 14px; /* Reduce font size on small screens */
+    }
+}
+
+/* Additional media query for even smaller screens */
+@media screen and (max-width: 480px) {
+    #main {
+        width: 90%; /* Adjust width for very small screens */
+        margin: 5px; /* Further reduce margin on very small screens */
+    }
+}
