@@ -5,7 +5,6 @@ from flask_session import Session
 import csv
 import threading
 import requests
-import time
 
 app = Flask(__name__)
 app.config['SESSION_TYPE'] = 'filesystem'
@@ -16,6 +15,7 @@ WEBHOOK_URL = os.environ['WEBHOOK_URL']
 
 def health_check_and_log():
     while True:
+        print("Entered Health Check")
         # Perform a health check request to your server
         try:
             response = requests.get("https://one-word-story.mochirondesu.repl.co/")  # Adjust the URL as needed
@@ -85,33 +85,33 @@ def add_word():
     current_time = time.time()
     time_elapsed = current_time - last_action_time
     forwarded_ip = request.headers.get('X-Forwarded-For')
+    new_word = request.form['word'].strip()
+    words = new_word.split()
 
     if time_elapsed < MIN_TIME_BETWEEN_ACTIONS:
         error_message = "Please wait before adding another word."
-        send_log_to_webhook(f"`{forwarded_ip}` Tried to send consecutive words.")
+        send_log_to_webhook(f"`{forwarded_ip}` Tried to send multiple requests before cooldown. Words: `{words}`")
         return redirect_with_error('index', error_message)
 
     session['last_action_time'] = current_time
 
-    new_word = request.form['word'].strip()
-    words = new_word.split()
 
     if len(words) != 1:
         error_message = "Please enter only one word."
-        send_log_to_webhook(f"`{forwarded_ip}` Tried to send mutiple words.")
+        send_log_to_webhook(f"`{forwarded_ip}` Tried to send mutiple words. Words: `{words}`")
         return redirect_with_error('index', error_message)
 
     last_sender_ip = get_last_sender_ip()
 
     if last_sender_ip == forwarded_ip:
         error_message = "You cannot send consecutive words."
-        send_log_to_webhook(f"`{forwarded_ip}` tried to send consecutive words.")
+        send_log_to_webhook(f"`{forwarded_ip}` tried to send consecutive words. Words: `{words}`")
         return redirect_with_error('index', error_message)
 
     with open('words.csv', 'a', newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow([new_word])
-        send_log_to_webhook(f"`{forwarded_ip}` addded the word {new_word}")
+        send_log_to_webhook(f"`{forwarded_ip}` addded the word `{new_word}`")
 
     set_last_sender_ip(forwarded_ip)
 
