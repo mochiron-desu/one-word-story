@@ -26,6 +26,7 @@
             {{ word[0] }}{% if not loop.last %} {% endif %}
             {% endfor %}
         </p>
+        <a href="{{ url_for('story_archive') }}">View Story Archive</a>
         <script>
             document.getElementById('wordInput').focus();
         </script>

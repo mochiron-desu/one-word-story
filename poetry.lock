@@ -137,6 +137,14 @@ socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use_chardet_on_py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
+name = "schedule"
+version = "1.2.0"
+description = "Job scheduling for humans."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[[package]]
 name = "urllib3"
 version = "2.0.4"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
@@ -167,7 +175,7 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "6a8e8c26ebae821a107fff9217a47eb177f75f529f8632c8d021bf43eb9f58a4"
+content-hash = "0afd726051939ffef37e4e79fb30db34a104ad960ccc89c64a11d7bea2233e09"
 
 [metadata.files]
 blinker = []
@@ -183,5 +191,6 @@ itsdangerous = []
 jinja2 = []
 markupsafe = []
 requests = []
+schedule = []
 urllib3 = []
 werkzeug = []

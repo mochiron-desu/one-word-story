@@ -5,6 +5,8 @@ from flask_session import Session
 import csv
 import threading
 import requests
+import schedule
+import datetime
 
 app = Flask(__name__)
 app.config['SESSION_TYPE'] = 'filesystem'
@@ -117,9 +119,51 @@ def add_word():
 
     return redirect_with_error('index', "")  # Redirect back to the main page
 
+@app.route('/view_story/<month_year>')
+def view_story_month_year(month_year):
+    try:
+        with open(f'data/{month_year}_words.csv', 'r') as csvfile:
+            csv_reader = csv.reader(csvfile)
+            words = list(csv_reader)
+            print(words)
+        return render_template('view_story.html', words=words, month_year=month_year)
+    except FileNotFoundError:
+        error_message = "Story not found for the selected month and year."
+        return redirect_with_error('index', error_message)
+
+@app.route('/story_archive')
+def story_archive():
+    months = get_existing_months()
+    return render_template('story.html', months=months)
+
+def get_existing_months():
+    months = []
+    for filename in os.listdir('data'):
+        if filename.endswith("_words.csv"):
+            month = filename.split("_words.csv")[0]
+            months.append(month)
+    return months
+
 def redirect_with_error(route, error_message):
     session['error_message'] = error_message
     return redirect(url_for(route))
+
+def save_words_for_previous_month():
+    now = datetime.datetime.now()
+    last_month = now.replace(day=1) - datetime.timedelta(days=1)
+    last_month_name = last_month.strftime("%B_%Y")
+
+    words = get_words()
+    with open(f'data/{last_month_name}_words.csv', 'w', newline='') as csvfile:
+        csv_writer = csv.writer(csvfile)
+        for word in words:
+            csv_writer.writerow(word)
+        send_log_to_webhook(f"Saved the data to {last_month_name}_words.csv")
+
+def schedule_daily_task():
+    send_log_to_webhook("Started Daily Task")
+    schedule.every().day.at('00:00').do(save_words_for_previous_month)
+    send_log_to_webhook("Completed Daily Task")
 
 if __name__ == '__main__':
     # Start the health checker thread
@@ -127,5 +171,7 @@ if __name__ == '__main__':
     health_checker_thread.daemon = True  # Allow the thread to exit when the main program exits
     health_checker_thread.start()
 
+    schedule_daily_task()
+  
     # Start the Flask application
     app.run(host='0.0.0.0', port=8080, debug=True)
